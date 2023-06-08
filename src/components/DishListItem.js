@@ -1,24 +1,31 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 
 const DishListItem = ({ dish }) => {
- 
-  return (
+  const navigation = useNavigation();
 
-      <TouchableOpacity>
-        <View style={styles.container}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.name}>{dish.name}</Text>
-            <Text style={styles.description}>{dish.description}</Text>
-            <Text style={styles.price}>{dish.price}</Text>
-          </View>
-          {dish.image && (
-            <Image source={{ uri: dish.image }} style={styles.image} />
-          )}
-        </View>
-      </TouchableOpacity>
- 
+  return (
+    <Pressable
+      onPress={() => navigation.navigate("Dish", { id: dish.id })}
+      style={styles.container}
+    >
+      <View style={{ flex: 1 }}>
+        <Text style={styles.name}>{dish.name}</Text>
+        <Text style={styles.description}>{dish.description}</Text>
+        <Text style={styles.price}>{dish.price}</Text>
+      </View>
+      {dish.image && (
+        <Image source={{ uri: dish.image }} style={styles.image} />
+      )}
+    </Pressable>
   );
 };
 

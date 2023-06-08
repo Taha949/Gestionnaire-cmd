@@ -1,0 +1,20 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-gestionnairedecomman-staging-201633-authRole",
+      "UnauthRoleArn": "arn:aws:iam::655263947906:role/amplify-gestionnairedecomman-staging-201633-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::655263947906:role/amplify-gestionnairedecomman-staging-201633-authRole",
+      "Region": "eu-north-1",
+      "DeploymentBucketName": "amplify-gestionnairedecomman-staging-201633-deployment",
+      "UnauthRoleName": "amplify-gestionnairedecomman-staging-201633-unauthRole",
+      "StackName": "amplify-gestionnairedecomman-staging-201633",
+      "StackId": "arn:aws:cloudformation:eu-north-1:655263947906:stack/amplify-gestionnairedecomman-staging-201633/32ec5850-0570-11ee-9062-0ee16136b334",
+      "AmplifyAppId": "d1pgup1142me71"
+    },
+    "categories": {
+      "auth": {
+        "Gestionnairedecommande": {}
+      }
+    }
+  }
+}

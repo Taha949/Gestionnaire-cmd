@@ -1,13 +1,21 @@
 import { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import restaurants from "../../../assets/data/restaurants.json";
+import { useNavigation } from "@react-navigation/native";
 
 const dish = restaurants[0].dishes[1];
 
 const DishDetailsScreen = () => {
   const [quantity, setQuantity] = useState(1);
   const [checkedIngredients, setCheckedIngredients] = useState([]);
+  const navigation = useNavigation();
 
   const onMinus = () => {
     if (quantity > 1) {
@@ -100,11 +108,14 @@ const DishDetailsScreen = () => {
             <AntDesign name="pluscircleo" size={60} color="black" />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.button}>
+        <Pressable
+          onPress={() => navigation.navigate("Basket")}
+          style={styles.button}
+        >
           <Text style={styles.buttonText}>
             Ajouter {quantity} au panier ({getTotal()}€)
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

@@ -1,25 +1,18 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import RestaurantDetailsScreen from "./src/screens/RestaurantDetailsScreen";
-import DishDetailsScreen from "./src/screens/DishDetailsScreen";
-import Basket from "./src/screens/Basket";
-import OrderScreen from "./src/screens/OrdersScreen";
-import OrderDetails from "./src/screens/OrderDetails";
+import { Amplify } from "aws-amplify";
+import RootNavigator from "./src/navigation";
+import { NavigationContainer } from "@react-navigation/native";
+import config from "./src/aws-exports";
+import { withAuthenticator } from "aws-amplify-react-native";
 
-export default function App() {
+Amplify.configure(config);
+
+function App() {
   return (
-    <View style={styles.container}>
-      <OrderDetails />
+    <NavigationContainer>
+      <RootNavigator />
       <StatusBar style="auto" />
-    </View>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+export default withAuthenticator(App);

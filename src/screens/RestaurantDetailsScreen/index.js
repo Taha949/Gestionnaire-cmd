@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import DishListItem from "../../components/BasketDishItem";
+import DishListItem from "../../components/DishListItem";
 import restaurants from "../../../assets/data/restaurants.json";
 import styles from "./styles";
 import Header from "./Header";
@@ -21,12 +21,6 @@ const RestaurantsDetailsPage = () => {
         ListHeaderComponent={() => <Header restaurant={restaurant} />}
         data={restaurant.dishes}
         renderItem={({ item }) => <DishListItem dish={item} />}
-      />
-      <Ionicons
-        name="arrow-back-circle"
-        size={45}
-        color="white"
-        style={styles.iconContainer}
       />
     </View>
   );
