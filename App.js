@@ -4,13 +4,26 @@ import RootNavigator from "./src/navigation";
 import { NavigationContainer } from "@react-navigation/native";
 import config from "./src/aws-exports";
 import { withAuthenticator } from "aws-amplify-react-native";
-
-Amplify.configure(config);
+import BasketContextProvider from "./src/contexts/BasketContext";
+import AuthContextProvider from "./src/contexts/AuthContext";
+import OrderContextProvider from "./src/contexts/OrderContext";
+Amplify.configure({
+  ...config,
+  Analytics: {
+    disabled: true,
+  },
+});
 
 function App() {
   return (
     <NavigationContainer>
-      <RootNavigator />
+      <AuthContextProvider>
+        <BasketContextProvider>
+          <OrderContextProvider>
+            <RootNavigator />
+          </OrderContextProvider>
+        </BasketContextProvider>
+      </AuthContextProvider>
       <StatusBar style="auto" />
     </NavigationContainer>
   );

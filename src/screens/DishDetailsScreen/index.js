@@ -1,22 +1,39 @@
-import { useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Pressable,
+  FlatList,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import restaurants from "../../../assets/data/restaurants.json";
-import { useNavigation } from "@react-navigation/native";
-
-const dish = restaurants[0].dishes[1];
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { DataStore } from "aws-amplify";
+import { useBasketContext } from "../../contexts/BasketContext";
+import RestaurantsDetailsScreen from "../RestaurantDetailsScreen";
+import { Dish } from "../../models";
 
 const DishDetailsScreen = () => {
+  const [dish, setDish] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [checkedIngredients, setCheckedIngredients] = useState([]);
   const navigation = useNavigation();
+  const route = useRoute();
+  const id = route.params?.id;
+  const { addDishToBasket } = useBasketContext();
 
+  useEffect(() => {
+    if (id) {
+      DataStore.query(Dish, id).then(setDish);
+    }
+  }, [id]);
+
+  const OnAddToBasket = async () => {
+    await addDishToBasket(dish, quantity);
+    //console.log(addDishToBasket);
+    navigation.goBack();
+  };
   const onMinus = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
@@ -29,75 +46,45 @@ const DishDetailsScreen = () => {
 
   const handleToggleCheckbox = (ingredient) => {
     if (checkedIngredients.includes(ingredient)) {
-      setCheckedIngredients(checkedIngredients.filter((i) => i !== ingredient));
+      setCheckedIngredients(
+        checkedIngredients.filter((item) => item !== ingredient)
+      );
     } else {
       setCheckedIngredients([...checkedIngredients, ingredient]);
     }
   };
 
   const getTotal = () => {
-    return (dish.price * quantity).toFixed(2);
+    return (dish?.prix * quantity).toFixed(2);
   };
 
+  if (!dish) {
+    return null;
+  }
+
   return (
-    <View>
-      <View style={styles.page}>
+    <View style={styles.page}>
+      <View>
         <Text style={styles.name}>{dish.name}</Text>
         <Text style={styles.description}>{dish.description}</Text>
         <View style={styles.separator} />
         <View>
-          <TouchableOpacity
-            style={styles.ingredientContainer}
-            onPress={() => handleToggleCheckbox("Salade")}
-          >
-            <View style={styles.checkbox}>
-              {checkedIngredients.includes("Salade") ? (
-                <AntDesign name="checksquareo" size={20} color="black" />
-              ) : (
-                <AntDesign name="checksquare" size={20} color="black" />
-              )}
-            </View>
-            <Text style={styles.ingredients}>Salade</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.ingredientContainer}
-            onPress={() => handleToggleCheckbox("Tomate")}
-          >
-            <View style={styles.checkbox}>
-              {checkedIngredients.includes("Tomate") ? (
-                <AntDesign name="checksquareo" size={20} color="black" />
-              ) : (
-                <AntDesign name="checksquare" size={20} color="black" />
-              )}
-            </View>
-            <Text style={styles.ingredients}>Tomate</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.ingredientContainer}
-            onPress={() => handleToggleCheckbox("Oignons")}
-          >
-            <View style={styles.checkbox}>
-              {checkedIngredients.includes("Oignons") ? (
-                <AntDesign name="checksquareo" size={20} color="black" />
-              ) : (
-                <AntDesign name="checksquare" size={20} color="black" />
-              )}
-            </View>
-            <Text style={styles.ingredients}>Oignons</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.ingredientContainer}
-            onPress={() => handleToggleCheckbox("Cornichons")}
-          >
-            <View style={styles.checkbox}>
-              {checkedIngredients.includes("Cornichons") ? (
-                <AntDesign name="checksquareo" size={20} color="black" />
-              ) : (
-                <AntDesign name="checksquare" size={20} color="black" />
-              )}
-            </View>
-            <Text style={styles.ingredients}>Cornichons</Text>
-          </TouchableOpacity>
+          {dish.ingredient.map((ingredient, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.ingredientContainer}
+              onPress={() => handleToggleCheckbox(ingredient)}
+            >
+              <View style={styles.checkbox}>
+                {checkedIngredients.includes(ingredient) ? (
+                  <AntDesign name="checksquare" size={20} color="black" />
+                ) : (
+                  <AntDesign name="checksquareo" size={20} color="black" />
+                )}
+              </View>
+              <Text style={styles.ingredients}>{ingredient}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
         <View style={styles.row}>
           <TouchableOpacity onPress={onMinus}>
@@ -108,10 +95,7 @@ const DishDetailsScreen = () => {
             <AntDesign name="pluscircleo" size={60} color="black" />
           </TouchableOpacity>
         </View>
-        <Pressable
-          onPress={() => navigation.navigate("Basket")}
-          style={styles.button}
-        >
+        <Pressable onPress={OnAddToBasket} style={styles.button}>
           <Text style={styles.buttonText}>
             Ajouter {quantity} au panier ({getTotal()}€)
           </Text>
@@ -125,7 +109,7 @@ const styles = StyleSheet.create({
   page: {
     flex: 1,
     width: "100%",
-    paddingVertical: 40, // temp fix
+    paddingVertical: 40,
     padding: 10,
   },
   name: {
@@ -162,11 +146,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 18,
   },
-  ingredients: {
-    padding: 10,
-    marginBottom: 10,
-    fontSize: 20,
-  },
   ingredientContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -174,6 +153,9 @@ const styles = StyleSheet.create({
   },
   checkbox: {
     marginRight: 10,
+  },
+  ingredients: {
+    fontSize: 16,
   },
 });
 

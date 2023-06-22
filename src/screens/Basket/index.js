@@ -1,21 +1,18 @@
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import restaurants from "../../../assets/data/restaurants.json";
+import { useBasketContext } from "../../contexts/BasketContext";
+import BasketDishItem from "../../components/BasketDishItem";
+import { Dish } from "../../models";
+import { useOrderContext } from "../../contexts/OrderContext";
+import { useNavigation } from "@react-navigation/native";
 
 const restaurant = restaurants[0];
 
-const BasketDishItem = ({ basketDish }) => {
-  return (
-    <View style={styles.row}>
-      <View style={styles.quantityContainer}>
-        <Text>1</Text>
-      </View>
-      <Text style={{ fontWeight: "600" }}>{basketDish.name}</Text>
-      <Text style={{ marginLeft: "auto" }}>€ {basketDish.price}</Text>
-    </View>
-  );
-};
-
 const Basket = () => {
+  const { panierParDishes, prixTotal, addDishToBasket } = useBasketContext();
+  const { createOrder } = useOrderContext();
+  const navigation = useNavigation();
+
   return (
     <View style={styles.page}>
       <Text style={styles.name}>{restaurant.name}</Text>
@@ -24,16 +21,17 @@ const Basket = () => {
       </Text>
 
       <FlatList
-        data={restaurant.dishes}
-        renderItem={({ item }) => <BasketDishItem basketDish={item} />}
+        data={panierParDishes}
+        renderItem={({ item }) => <BasketDishItem panierParDish={item} />}
       />
       <View style={styles.separator} />
-      <View styles={styles.button}>
-        <Text style={styles.buttonText}>Create order</Text>
-      </View>
+      <Pressable onPress={createOrder} style={styles.button}>
+        <Text style={styles.buttonText}>Envoyer la commande €{prixTotal}</Text>
+      </Pressable>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   page: {
     flex: 1,
@@ -65,13 +63,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   button: {
-    backgroundColor: "black",
+    backgroundColor: "lightgrey",
     marginTop: "auto",
     padding: 20,
     alignItems: "center",
   },
   buttonText: {
-    color: "white",
+    color: "black",
     fontWeight: "600",
     fontSize: 18,
   },

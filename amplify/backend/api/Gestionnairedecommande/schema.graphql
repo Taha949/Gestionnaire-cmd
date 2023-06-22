@@ -1,0 +1,51 @@
+enum CommandeStatut {
+  EPREPARATIONN
+  PRETE
+  ANNULEE
+}
+
+type CommandeParDish @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  quantity: Int!
+  Dish: Dish @hasOne
+  commandeID: ID! @index(name: "byCommande")
+}
+
+type Commande @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  serveurID: ID! @index(name: "byServeur")
+  total: Float!
+  statut: CommandeStatut!
+  CommandeParDishes: [CommandeParDish] @hasMany(indexName: "byCommande", fields: ["id"])
+}
+
+type PanierParDish @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  quantity: Int
+  Dish: Dish @hasOne
+  panierID: ID! @index(name: "byPanier")
+}
+
+type Panier @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  PanierParDishes: [PanierParDish] @hasMany(indexName: "byPanier", fields: ["id"])
+  serveurID: ID! @index(name: "byServeur")
+}
+
+type Serveur @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  Commandes: [Commande] @hasMany(indexName: "byServeur", fields: ["id"])
+  sub: String
+  Paniers: [Panier] @hasMany(indexName: "byServeur", fields: ["id"])
+}
+
+type Dish @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  image: String!
+  description: String
+  prix: Float
+  ingredient: [String!]
+}
+ 

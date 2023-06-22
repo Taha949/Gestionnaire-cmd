@@ -7,25 +7,50 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
+  Alert,
 } from "react-native";
+import { DataStore } from "@aws-amplify/datastore";
+import { Dish } from "../models";
 
-const DishListItem = ({ dish }) => {
+const DishListItem2 = ({ dish }) => {
   const navigation = useNavigation();
 
+  const handleDeleteDish = () => {
+    Alert.alert(
+      "Supprimer le plat",
+      "Êtes-vous sûr de vouloir supprimer ce plat ?",
+      [
+        {
+          text: "Annuler",
+          style: "cancel",
+        },
+        {
+          text: "Supprimer",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await DataStore.delete(Dish, dish.id);
+            } catch (error) {
+              console.log("Erreur lors de la suppression du plat :", error);
+              // Gérez les erreurs de suppression du plat ici
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
-    <Pressable
-      onPress={() => navigation.navigate("Dish", { id: dish.id })}
-      style={styles.container}
-    >
+    <TouchableOpacity onPress={handleDeleteDish} style={styles.container}>
       <View style={{ flex: 1 }}>
         <Text style={styles.name}>{dish.name}</Text>
         <Text style={styles.description}>{dish.description}</Text>
-        <Text style={styles.price}>{dish.prix}</Text>
+        <Text style={styles.price}>{dish.price}</Text>
       </View>
       {dish.image && (
         <Image source={{ uri: dish.image }} style={styles.image} />
       )}
-    </Pressable>
+    </TouchableOpacity>
   );
 };
 
@@ -56,4 +81,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DishListItem;
+export default DishListItem2;
