@@ -50,8 +50,8 @@ type EagerCommande = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly serveurID: string;
-  readonly total: number;
+  readonly serveurID?: string | null;
+  readonly total?: string | null;
   readonly statut: CommandeStatut | keyof typeof CommandeStatut;
   readonly CommandeParDishes?: (CommandeParDish | null)[] | null;
   readonly createdAt?: string | null;
@@ -64,8 +64,8 @@ type LazyCommande = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly serveurID: string;
-  readonly total: number;
+  readonly serveurID?: string | null;
+  readonly total?: string | null;
   readonly statut: CommandeStatut | keyof typeof CommandeStatut;
   readonly CommandeParDishes: AsyncCollection<CommandeParDish>;
   readonly createdAt?: string | null;
@@ -85,11 +85,11 @@ type EagerPanierParDish = {
   };
   readonly id: string;
   readonly quantity?: number | null;
-  readonly Dish?: Dish | null;
+  readonly Dish: Dish;
   readonly panierID: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly panierParDishDishId?: string | null;
+  readonly panierParDishDishId: string;
 }
 
 type LazyPanierParDish = {
@@ -99,11 +99,11 @@ type LazyPanierParDish = {
   };
   readonly id: string;
   readonly quantity?: number | null;
-  readonly Dish: AsyncItem<Dish | undefined>;
+  readonly Dish: AsyncItem<Dish>;
   readonly panierID: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly panierParDishDishId?: string | null;
+  readonly panierParDishDishId: string;
 }
 
 export declare type PanierParDish = LazyLoading extends LazyLoadingDisabled ? EagerPanierParDish : LazyPanierParDish

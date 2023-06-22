@@ -4,15 +4,17 @@ import { useBasketContext } from "../contexts/BasketContext";
 import { Dish, PanierParDish } from "../models";
 
 const BasketDishItem = ({ panierParDish }) => {
-  // console.log(panierParDish.Dish.name);
+  //console.log(panierParDish.Dish._j.name); // Résultat : Jsjs
+
+  const { addDishToBasket } = useBasketContext();
 
   return (
     <View style={styles.row}>
       <View style={styles.quantityContainer}>
         <Text>{panierParDish.quantity}</Text>
       </View>
-      <Text style={{ fontWeight: "600" }}>{panierParDish.Dish.name}</Text>
-      <Text style={{ marginLeft: "auto" }}>€ {panierParDish.Dish.prix}</Text>
+      <Text style={{ fontWeight: "600" }}>{panierParDish.Dish._j.name}</Text>
+      <Text style={{ marginLeft: "auto" }}>€ {panierParDish.Dish._j.prix}</Text>
     </View>
   );
 };

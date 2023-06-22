@@ -8,6 +8,12 @@ const BasketContextProvider = ({ children }) => {
   const { dbServeur } = useAuthContext();
   const [panier, setPanier] = useState(null);
   const [panierParDishes, setPanierParDishes] = useState([]);
+  console.log(panierParDishes.Dish);
+  const prixTotal = panierParDishes.reduce(
+    (sum, panierParDish) =>
+      sum + panierParDish.quantity * panierParDish.Dish.prix,
+    0
+  );
 
   useEffect(() => {
     DataStore.query(Panier, (p) => p.serveurID("eq", dbServeur.id)).then(
@@ -22,13 +28,11 @@ const BasketContextProvider = ({ children }) => {
       );
     }
   }, [panier]);
-  const prixTotal = panierParDishes.reduce(
-    (sum, panierParDish) =>
-      sum + panierParDish.quantity * panierParDish.Dish.prix,
-    0
-  );
 
+  console.log(panierParDishes.Dish);
   const addDishToBasket = async (dish, quantity) => {
+    //console.log("adddddd", dish.name, quantity);
+
     let lePanier = panier || (await createNewpanier());
     const newDish = await DataStore.save(
       new PanierParDish({ quantity, Dish: dish, panierID: lePanier.id })

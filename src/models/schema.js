@@ -114,14 +114,14 @@ export const schema = {
                     "name": "serveurID",
                     "isArray": false,
                     "type": "ID",
-                    "isRequired": true,
+                    "isRequired": false,
                     "attributes": []
                 },
                 "total": {
                     "name": "total",
                     "isArray": false,
-                    "type": "Float",
-                    "isRequired": true,
+                    "type": "ID",
+                    "isRequired": false,
                     "attributes": []
                 },
                 "statut": {
@@ -223,7 +223,7 @@ export const schema = {
                     "type": {
                         "model": "Dish"
                     },
-                    "isRequired": false,
+                    "isRequired": true,
                     "attributes": [],
                     "association": {
                         "connectionType": "HAS_ONE",
@@ -262,7 +262,7 @@ export const schema = {
                     "name": "panierParDishDishId",
                     "isArray": false,
                     "type": "ID",
-                    "isRequired": false,
+                    "isRequired": true,
                     "attributes": []
                 }
             },
@@ -583,5 +583,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.4.3",
-    "version": "2e4312830db64a59fe4e7417b97b56a6"
+    "version": "7e304cdcb21ca4cf0f168859240d9240"
 };

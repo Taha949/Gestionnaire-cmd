@@ -1,11 +1,13 @@
 import { View, Text, Image, SafeAreaView, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-const OrderListItem = ({ order }) => {
+const OrderListItem = ({ commande }) => {
   const navigation = useNavigation();
   const random = Math.floor(Math.random() * (1000 - 10 + 1)) + 10;
   return (
-    <Pressable onPress={() => navigation.navigate("Order", { id: order.id })}>
+    <Pressable
+      onPress={() => navigation.navigate("Order", { id: commande.id })}
+    >
       <SafeAreaView style={{ flexirection: "row", margin: 10, paddingTop: 10 }}>
         <View>
           <Text style={{ fontWeight: "600", fontSize: 16 }}>

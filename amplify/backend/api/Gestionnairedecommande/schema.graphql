@@ -13,8 +13,8 @@ type CommandeParDish @model @auth(rules: [{allow: public}]) {
 
 type Commande @model @auth(rules: [{allow: public}]) {
   id: ID!
-  serveurID: ID! @index(name: "byServeur")
-  total: Float!
+  serveurID: ID @index(name: "byServeur")
+  total: ID
   statut: CommandeStatut!
   CommandeParDishes: [CommandeParDish] @hasMany(indexName: "byCommande", fields: ["id"])
 }
@@ -22,7 +22,7 @@ type Commande @model @auth(rules: [{allow: public}]) {
 type PanierParDish @model @auth(rules: [{allow: public}]) {
   id: ID!
   quantity: Int
-  Dish: Dish @hasOne
+  Dish: Dish! @hasOne
   panierID: ID! @index(name: "byPanier")
 }
 

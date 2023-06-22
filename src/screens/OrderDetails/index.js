@@ -21,7 +21,6 @@ const OrderDetailsHeader = () => {
 const OrderDetails = () => {
   return (
     <FlatList
-      ListHeaderComponent={OrderDetailsHeader}
       data={restaurants[0].dishes}
       renderItem={({ item }) => <BasketDishItem basketDish={item} />}
     />
