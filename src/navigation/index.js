@@ -10,6 +10,7 @@ import { useAuthContext } from "../contexts/AuthContext";
 import ProfileScreen from "../screens/ProfileScreen";
 import RestaurantsDetailsScreen2 from "../screens/RestaurantDetailsScreen2";
 import AjouterProduit from "../screens/AjouterProduit";
+import ChangeDish from "../screens/ChangeDish";
 
 const Stack = createNativeStackNavigator();
 
@@ -92,6 +93,7 @@ const ProductStackNavigator = () => {
         component={RestaurantsDetailsScreen2}
       />
       <OrderStack.Screen name="Produit" component={AjouterProduit} />
+      <OrderStack.Screen name="ChangeDish" component={ChangeDish} />
     </OrderStack.Navigator>
   );
 };

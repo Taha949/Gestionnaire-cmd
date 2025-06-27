@@ -1,38 +1,79 @@
-import { View, Text, StyleSheet, FlatList } from "react-native";
-
+import React from "react";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useBasketContext } from "../contexts/BasketContext";
-import { Dish, PanierParDish } from "../models";
+import { AntDesign } from "@expo/vector-icons";
 
 const BasketDishItem = ({ panierParDish }) => {
-  //console.log(panierParDish.Dish._j.name); // Résultat : Jsjs
+  const { updateQuantity } = useBasketContext();
 
-  const { addDishToBasket } = useBasketContext();
+  if (!panierParDish?.Dish) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.error}>⚠️ Plat introuvable</Text>
+      </View>
+    );
+  }
+
+  const { Dish, quantity } = panierParDish;
+  console.log(Dish);
+
+  const increment = () => {
+    updateQuantity(panierParDish, quantity + 1);
+  };
+  const decrement = () => {
+    updateQuantity(panierParDish, quantity - 1);
+  };
 
   return (
-    <View style={styles.row}>
+    <View style={styles.container}>
       <View style={styles.quantityContainer}>
-        <Text>{panierParDish.quantity}</Text>
+        <Pressable onPress={decrement} hitSlop={10}>
+          <AntDesign name="minus" size={20} color="black" />
+        </Pressable>
+        <Text style={styles.quantity}>{quantity}</Text>
+        <Pressable onPress={increment} hitSlop={10}>
+          <AntDesign name="plus" size={20} color="black" />
+        </Pressable>
       </View>
-      <Text style={{ fontWeight: "600" }}>{panierParDish.Dish._j.name}</Text>
-      <Text style={{ marginLeft: "auto" }}>€ {panierParDish.Dish._j.prix}</Text>
+      <Text style={styles.name}>{Dish.name}</Text>
+      <Text style={styles.price}>
+        €{Dish.prix ? Dish.prix.toFixed(2) : "N/A"}
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  row: {
+  container: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  quantityContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 15,
-    paddingHorizontal: 10,
   },
-
-  quantityContainer: {
-    backgroundColor: "lightgray",
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    marginRight: 10,
-    borderRadius: 3,
+  quantity: {
+    fontSize: 16,
+    color: "#555",
+    marginHorizontal: 8,
+  },
+  name: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  error: {
+    color: "red",
+    fontStyle: "italic",
   },
 });
+
 export default BasketDishItem;

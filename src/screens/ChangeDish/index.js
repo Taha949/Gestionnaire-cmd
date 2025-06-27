@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,20 +11,47 @@ import { DataStore } from "aws-amplify";
 import { Dish } from "../../models";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-const Produit = () => {
+const ChangeDish = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { id } = route.params || {};
+
+  const [dishOriginal, setDishOriginal] = useState(null);
   const [name, setName] = useState("");
   const [prix, setPrix] = useState("");
   const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
   const [ingredient, setIngredient] = useState([]);
-  const navigation = useNavigation();
 
-  const addIngredient = () => {
-    const newIngredient = "";
-    setIngredient((prevIngredient) => [...prevIngredient, newIngredient]);
-  };
+  useEffect(() => {
+    if (!id) {
+      Alert.alert("Erreur", "Aucun plat sélectionné");
+      navigation.goBack();
+      return;
+    }
 
-  const ajouterProduit = async () => {
+    // Charger le plat depuis DataStore
+    DataStore.query(Dish, id)
+      .then((dish) => {
+        if (!dish) {
+          Alert.alert("Erreur", "Plat introuvable");
+          navigation.goBack();
+          return;
+        }
+        setDishOriginal(dish);
+        // Pré-remplir les champs
+        setName(dish.name || "");
+        setPrix(dish.prix?.toString() || "");
+        setImage(dish.image || "");
+        setDescription(dish.description || "");
+        setIngredient(dish.ingredient || []);
+      })
+      .catch((e) => console.log("Erreur chargement plat", e));
+  }, [id]);
+
+  const modifierProduit = async () => {
+    if (!dishOriginal) return;
+
     if (!name || !prix || ingredient.length === 0 || !image || !description) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs");
       return;
@@ -35,46 +62,31 @@ const Produit = () => {
       return;
     }
 
-    const nouveauProduit = new Dish({
-      name: name,
-      image: image,
-      description: description,
-      prix: parseFloat(prix),
-      ingredient: ingredient,
-    });
-
     try {
-      await DataStore.save(nouveauProduit);
-      // Après l'ajout réussi : réinitialiser les champs puis revenir en arrière
-      const resetFields = () => {
-        setName("");
-        setPrix("");
-        setImage("");
-        setDescription("");
-        setIngredient([]);
-      };
-
-      Alert.alert("Succès", "Le produit a été ajouté avec succès", [
+      const updated = await DataStore.save(
+        Dish.copyOf(dishOriginal, (updated) => {
+          updated.name = name;
+          updated.prix = parsedPrix;
+          updated.image = image;
+          updated.description = description;
+          updated.ingredient = ingredient;
+        })
+      );
+      Alert.alert("Succès", "Le plat a été modifié", [
         {
           text: "OK",
-          onPress: () => {
-            resetFields();
-            navigation.goBack();
-          },
+          onPress: () => navigation.goBack(),
         },
       ]);
     } catch (error) {
-      console.log("Erreur lors de l'ajout du produit :", error);
-      Alert.alert(
-        "Erreur",
-        "Une erreur s'est produite lors de l'ajout du produit"
-      );
+      console.log("Erreur lors de la modification du plat :", error);
+      Alert.alert("Erreur", "Une erreur est survenue");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Ajouter un produit</Text>
+      <Text style={styles.title}>Modifier le plat</Text>
       <TextInput
         value={name}
         onChangeText={setName}
@@ -106,11 +118,8 @@ const Produit = () => {
         placeholder="Ingrédients"
         style={styles.input}
       />
-      <TouchableOpacity onPress={addIngredient} style={styles.addButton}>
-        <Text style={styles.buttonText}>Ajouter un ingrédient</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={ajouterProduit} style={styles.addButton}>
-        <Text style={styles.buttonText}>Ajouter un produit</Text>
+      <TouchableOpacity onPress={modifierProduit} style={styles.addButton}>
+        <Text style={styles.buttonText}>Enregistrer les modifications</Text>
       </TouchableOpacity>
     </View>
   );
@@ -135,7 +144,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   addButton: {
-    backgroundColor: "#2ecc71",
+    backgroundColor: "#3498db",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
@@ -148,4 +157,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Produit;
+export default ChangeDish; 

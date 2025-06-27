@@ -9,13 +9,19 @@ import { useNavigation } from "@react-navigation/native";
 const restaurant = restaurants[0];
 
 const Basket = () => {
-  const OnCreateOrder = async () => {
-    await createOrder();
-    navigation.goBack();
-  };
-  const { panierParDishes, addDishToBasket, prixTotal } = useBasketContext();
+  const { panierParDishes, addDishToBasket, prixTotal, clearBasket: clearBasketContext } = useBasketContext();
   const { createOrder } = useOrderContext();
   const navigation = useNavigation();
+  console.log("Basket/index: clearBasketContext est", typeof clearBasketContext);
+
+  const OnCreateOrder = async () => {
+    await createOrder();
+    console.log("OnCreateOrder: clearBasketContext est", typeof clearBasketContext, clearBasketContext);
+    await clearBasketContext();
+    navigation.goBack();
+  };
+
+  const isEmpty = panierParDishes.length === 0;
 
   return (
     <View style={styles.page}>
@@ -29,8 +35,15 @@ const Basket = () => {
         renderItem={({ item }) => <BasketDishItem panierParDish={item} />}
       />
       <View style={styles.separator} />
-      <Pressable onPress={OnCreateOrder} style={styles.button}>
-        <Text style={styles.buttonText}>Envoyer la commande €{prixTotal}</Text>
+      <Pressable
+        onPress={OnCreateOrder}
+        disabled={isEmpty}
+        style={[
+          styles.button,
+          { backgroundColor: isEmpty ? "#ccc" : "lightgrey" },
+        ]}
+      >
+        <Text style={[styles.buttonText, { color: isEmpty ? "#777" : "black" }]}>Envoyer la commande €{prixTotal}</Text>
       </Pressable>
     </View>
   );

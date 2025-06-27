@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   View,
@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { DataStore } from "@aws-amplify/datastore";
 import { Dish } from "../models";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const DishListItem2 = ({ dish }) => {
   const navigation = useNavigation();
@@ -40,17 +41,32 @@ const DishListItem2 = ({ dish }) => {
     );
   };
 
+  const handleEditDish = () => {
+    navigation.navigate("ChangeDish", { id: dish.id });
+  };
+
   return (
-    <TouchableOpacity onPress={handleDeleteDish} style={styles.container}>
+    <View style={styles.container}>
       <View style={{ flex: 1 }}>
         <Text style={styles.name}>{dish.name}</Text>
         <Text style={styles.description}>{dish.description}</Text>
         <Text style={styles.price}>{dish.price}</Text>
       </View>
+
+      {/* Icône stylo pour édition */}
+      <Pressable onPress={handleEditDish} style={styles.editButton} hitSlop={10}>
+        <MaterialIcons name="edit" size={24} color="black" />
+      </Pressable>
+
       {dish.image && (
         <Image source={{ uri: dish.image }} style={styles.image} />
       )}
-    </TouchableOpacity>
+
+      {/* Icône corbeille cliquable à l'extrême droite */}
+      <Pressable onPress={handleDeleteDish} style={styles.trashButton} hitSlop={10}>
+        <MaterialIcons name="delete" size={24} color="black" />
+      </Pressable>
+    </View>
   );
 };
 
@@ -78,6 +94,18 @@ const styles = StyleSheet.create({
   image: {
     height: 75,
     aspectRatio: 1,
+  },
+  trashButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    marginLeft: 5,
+  },
+  editButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    marginLeft: 5,
   },
 });
 

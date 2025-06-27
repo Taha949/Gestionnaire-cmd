@@ -9,7 +9,7 @@ const OrderScreen = () => {
   return (
     <View style={{ flex: 1, width: "100%" }}>
       <FlatList
-        data={commandes}
+        data={[...commandes].reverse()}
         renderItem={({ item }) => <OrderListItem commande={item} />}
       />
     </View>

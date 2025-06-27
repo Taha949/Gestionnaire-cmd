@@ -3,7 +3,6 @@ import { Amplify } from "aws-amplify";
 import RootNavigator from "./src/navigation";
 import { NavigationContainer } from "@react-navigation/native";
 import config from "./src/aws-exports";
-import { withAuthenticator } from "aws-amplify-react-native";
 import BasketContextProvider from "./src/contexts/BasketContext";
 import AuthContextProvider from "./src/contexts/AuthContext";
 import OrderContextProvider from "./src/contexts/OrderContext";
@@ -28,4 +27,4 @@ function App() {
     </NavigationContainer>
   );
 }
-export default withAuthenticator(App);
+export default App;

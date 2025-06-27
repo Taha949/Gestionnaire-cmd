@@ -25,13 +25,18 @@ const DishDetailsScreen = () => {
 
   useEffect(() => {
     if (id) {
-      DataStore.query(Dish, id).then(setDish);
+      DataStore.query(Dish, id).then((d) => {
+        setDish(d);
+        if (d?.ingredient) {
+          setCheckedIngredients(d.ingredient);
+        }
+      });
     }
   }, [id]);
 
   const OnAddToBasket = async () => {
-    await addDishToBasket(dish, quantity);
-    //console.log(addDishToBasket);
+    const customizedDish = { ...dish, ingredient: checkedIngredients };
+    await addDishToBasket(customizedDish, quantity);
     navigation.goBack();
   };
   const onMinus = () => {
