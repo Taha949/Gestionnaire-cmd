@@ -16,7 +16,6 @@ const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
   const { dbServeur } = useAuthContext();
-// sata maline
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {dbServeur ? (
@@ -50,9 +49,7 @@ const NewTabs = () => {
         name="Profil"
         component={ProfileScreen}
         options={{
-          tabBarIcon: () => (
-            <Ionicons name="person" size={24} color="black" />
-          ),
+          tabBarIcon: () => <Ionicons name="person" size={24} color="black" />,
         }}
       />
       <Tab.Screen
@@ -62,7 +59,7 @@ const NewTabs = () => {
           tabBarIcon: () => (
             <MaterialCommunityIcons name="notebook" size={24} color="black" />
           ),
-          tabBarLabel:'Commandes'
+          tabBarLabel: "Commandes",
         }}
       />
       <Tab.Screen
