@@ -16,7 +16,7 @@ const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
   const { dbServeur } = useAuthContext();
-
+// sata maline
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {dbServeur ? (
@@ -30,25 +30,39 @@ const RootNavigator = () => {
 
 const Tab = createMaterialBottomTabNavigator();
 const NewTabs = () => {
+  const { dbServeur } = useAuthContext();
+  const isCuisinier = dbServeur?.role === "CUISINIER";
+
   return (
-    <Tab.Navigator>
+    <Tab.Navigator key={isCuisinier ? "cuisinier" : "serveur"}>
+      {!isCuisinier && (
+        <Tab.Screen
+          name="Nouvelle commande"
+          component={HomeStackNavigator}
+          options={{
+            tabBarIcon: () => (
+              <Ionicons name="restaurant" size={24} color="black" />
+            ),
+          }}
+        />
+      )}
       <Tab.Screen
-        name="Nouvelle commande"
-        component={HomeStackNavigator}
+        name="Profil"
+        component={ProfileScreen}
         options={{
           tabBarIcon: () => (
-            <Ionicons name="restaurant" size={24} color="black" />
+            <Ionicons name="person" size={24} color="black" />
           ),
         }}
       />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen
-        name="Commandes"
+        name="CommandesTab"
         component={OrderStackNavigator}
         options={{
           tabBarIcon: () => (
             <MaterialCommunityIcons name="notebook" size={24} color="black" />
           ),
+          tabBarLabel:'Commandes'
         }}
       />
       <Tab.Screen
@@ -79,8 +93,8 @@ const OrderStack = createNativeStackNavigator();
 const OrderStackNavigator = () => {
   return (
     <OrderStack.Navigator>
-      <OrderStack.Screen name="Orders" component={OrderScreen} />
-      <OrderStack.Screen name="Order" component={OrderDetails} />
+      <OrderStack.Screen name="Commandes" component={OrderScreen} />
+      <OrderStack.Screen name="Commande" component={OrderDetails} />
     </OrderStack.Navigator>
   );
 };

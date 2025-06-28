@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   View,
@@ -11,10 +11,13 @@ import {
 } from "react-native";
 import { DataStore } from "@aws-amplify/datastore";
 import { Dish } from "../models";
-import { MaterialIcons } from "@expo/vector-icons";
+import { useAuthContext } from "../contexts/AuthContext";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const DishListItem2 = ({ dish }) => {
   const navigation = useNavigation();
+  const { dbServeur } = useAuthContext();
+  const isServeur = (dbServeur?.role || '').toUpperCase() === 'SERVEUR';
 
   const handleDeleteDish = () => {
     Alert.alert(
@@ -29,11 +32,11 @@ const DishListItem2 = ({ dish }) => {
           text: "Supprimer",
           style: "destructive",
           onPress: async () => {
+            await DataStore.start();
             try {
               await DataStore.delete(Dish, dish.id);
             } catch (error) {
               console.log("Erreur lors de la suppression du plat :", error);
-              // Gérez les erreurs de suppression du plat ici
             }
           },
         },
@@ -41,31 +44,50 @@ const DishListItem2 = ({ dish }) => {
     );
   };
 
-  const handleEditDish = () => {
-    navigation.navigate("ChangeDish", { id: dish.id });
+  const toggleVisibility = async () => {
+    await DataStore.start();
+    try {
+      await DataStore.save(
+        Dish.copyOf(dish, (updated) => {
+          updated.visible = dish.visible === false ? true : false;
+        })
+      );
+    } catch (e) {
+      console.log("Erreur toggle visibility", e);
+    }
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={{ flex: 1 }}>
-        <Text style={styles.name}>{dish.name}</Text>
-        <Text style={styles.description}>{dish.description}</Text>
-        <Text style={styles.price}>{dish.price}</Text>
-      </View>
+  const isUnavailable = dish.visible === false;
 
-      {/* Icône stylo pour édition */}
-      <Pressable onPress={handleEditDish} style={styles.editButton} hitSlop={10}>
-        <MaterialIcons name="edit" size={24} color="black" />
-      </Pressable>
+  return (
+    <View style={[styles.container, isUnavailable && styles.unavailableContainer]}>
+      <View style={{ flex: 1 }}>
+        <Text style={[styles.name, isUnavailable && styles.unavailableText]}>
+          {dish.name} {isUnavailable ? "(épuisé)" : ""}
+        </Text>
+        <Text style={[styles.description, isUnavailable && styles.unavailableText]}>{dish.description}</Text>
+        <Text style={[styles.price, isUnavailable && styles.unavailableText]}>{dish.price}</Text>
+      </View>
 
       {dish.image && (
         <Image source={{ uri: dish.image }} style={styles.image} />
       )}
 
-      {/* Icône corbeille cliquable à l'extrême droite */}
-      <Pressable onPress={handleDeleteDish} style={styles.trashButton} hitSlop={10}>
-        <MaterialIcons name="delete" size={24} color="black" />
-      </Pressable>
+      {!isServeur && (
+        <>
+          <Pressable onPress={() => navigation.navigate('ChangeDish',{id:dish.id})} style={styles.editButton} hitSlop={10}>
+            <MaterialIcons name="edit" size={24} color="black" />
+          </Pressable>
+
+          <Pressable onPress={toggleVisibility} style={styles.eyeButton} hitSlop={10}>
+            <MaterialCommunityIcons name={dish.visible === false ? 'eye' : 'eye-off'} size={24} color="black" />
+          </Pressable>
+
+          <Pressable onPress={handleDeleteDish} style={styles.trashButton} hitSlop={10}>
+            <MaterialIcons name="delete" size={24} color="black" />
+          </Pressable>
+        </>
+      )}
     </View>
   );
 };
@@ -95,17 +117,23 @@ const styles = StyleSheet.create({
     height: 75,
     aspectRatio: 1,
   },
-  trashButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    marginLeft: 5,
+  unavailableContainer: {
+    backgroundColor: "#f0f0f0",
+  },
+  unavailableText: {
+    color: "#808080",
   },
   editButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    marginLeft: 5,
+    padding: 5,
+    marginTop: 17,
+  },
+  eyeButton: {
+    padding: 5,
+    marginTop: 17,
+  },
+  trashButton: {
+    padding: 5,
+    marginTop: 17,
   },
 });
 

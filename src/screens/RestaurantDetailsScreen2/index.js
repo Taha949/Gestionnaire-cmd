@@ -8,10 +8,13 @@ import { DataStore } from "@aws-amplify/datastore";
 import "@azure/core-asynciterator-polyfill";
 import { useNavigation } from "@react-navigation/native";
 import { useBasketContext } from "../../contexts/BasketContext";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 export default function RestaurantsDetailsScreen() {
   const navigation = useNavigation();
   const { panier, panierParDishes } = useBasketContext();
+  const { dbServeur } = useAuthContext();
+  const isServeur = dbServeur?.role === "SERVEUR";
   const handleAjouterProduit = () => {
     navigation.navigate("Produit");
   };
@@ -28,9 +31,11 @@ export default function RestaurantsDetailsScreen() {
         renderItem={({ item }) => <DishListItem2 dish={item} />}
       />
 
-      <Pressable style={styles.button} onPress={handleAjouterProduit}>
-        <Text style={styles.buttonText}>Ajouter un produit</Text>
-      </Pressable>
+      {!isServeur && (
+        <Pressable style={styles.button} onPress={handleAjouterProduit}>
+          <Text style={styles.buttonText}>Ajouter un produit</Text>
+        </Pressable>
+      )}
     </View>
   );
 }

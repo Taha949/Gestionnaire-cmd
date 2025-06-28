@@ -10,6 +10,7 @@ import {
 import { DataStore } from "aws-amplify";
 import { Dish } from "../../models";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 const ChangeDish = () => {
   const navigation = useNavigation();
@@ -22,6 +23,17 @@ const ChangeDish = () => {
   const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
   const [ingredient, setIngredient] = useState([]);
+
+  const { dbServeur } = useAuthContext();
+  const isServeur = dbServeur?.role === "SERVEUR";
+
+  useEffect(() => {
+    if (isServeur) {
+      Alert.alert("Accès refusé", "Vous n'êtes pas autorisé à modifier un plat.", [
+        { text: "OK", onPress: () => navigation.goBack() },
+      ]);
+    }
+  }, [isServeur]);
 
   useEffect(() => {
     if (!id) {
@@ -50,6 +62,7 @@ const ChangeDish = () => {
   }, [id]);
 
   const modifierProduit = async () => {
+    await DataStore.start();
     if (!dishOriginal) return;
 
     if (!name || !prix || ingredient.length === 0 || !image || !description) {
@@ -87,40 +100,44 @@ const ChangeDish = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Modifier le plat</Text>
-      <TextInput
-        value={name}
-        onChangeText={setName}
-        placeholder="Nom"
-        style={styles.input}
-      />
-      <TextInput
-        value={image}
-        onChangeText={setImage}
-        placeholder="Image"
-        style={styles.input}
-      />
-      <TextInput
-        value={description}
-        onChangeText={setDescription}
-        placeholder="Description"
-        style={styles.input}
-      />
-      <TextInput
-        value={prix}
-        onChangeText={setPrix}
-        placeholder="Prix"
-        style={styles.input}
-        keyboardType="numeric"
-      />
-      <TextInput
-        value={ingredient.join(", ")}
-        onChangeText={(text) => setIngredient(text.split(", "))}
-        placeholder="Ingrédients"
-        style={styles.input}
-      />
-      <TouchableOpacity onPress={modifierProduit} style={styles.addButton}>
-        <Text style={styles.buttonText}>Enregistrer les modifications</Text>
-      </TouchableOpacity>
+      {!isServeur && (
+        <>
+        <TextInput
+          value={name}
+          onChangeText={setName}
+          placeholder="Nom"
+          style={styles.input}
+        />
+        <TextInput
+          value={image}
+          onChangeText={setImage}
+          placeholder="Image"
+          style={styles.input}
+        />
+        <TextInput
+          value={description}
+          onChangeText={setDescription}
+          placeholder="Description"
+          style={styles.input}
+        />
+        <TextInput
+          value={prix}
+          onChangeText={setPrix}
+          placeholder="Prix"
+          style={styles.input}
+          keyboardType="numeric"
+        />
+        <TextInput
+          value={ingredient.join(", ")}
+          onChangeText={(text) => setIngredient(text.split(", "))}
+          placeholder="Ingrédients"
+          style={styles.input}
+        />
+        <TouchableOpacity onPress={modifierProduit} style={styles.addButton}>
+          <Text style={styles.buttonText}>Enregistrer les modifications</Text>
+        </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 };

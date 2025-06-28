@@ -1,38 +1,32 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { DataStore } from "aws-amplify";
-import { Commande, CommandeParDish, Panier, Dish } from "../models";
+import { Commande, CommandeParDish, Dish, Serveur } from "../models";
 import { useAuthContext } from "./AuthContext";
 import { useBasketContext } from "./BasketContext";
 
 const OrderContext = createContext({});
 
 const OrderContextProvider = ({ children }) => {
-  const { dbServeur } = useAuthContext();
+  const { dbServeur, sub } = useAuthContext();
   const { prixTotal, panierParDishes, panier } = useBasketContext();
   const [commandes, setCommandes] = useState([]);
   const [itemsCount, setItemsCount] = useState(0);
   const [total, setTotal] = useState(0);
 
+  // observer toutes les commandes et les trier (plus de filtre serveurID)
   useEffect(() => {
-    if (!dbServeur?.id) return;
-    const sub = DataStore.observeQuery(
-      Commande,
-      (c) => c.serveurID('eq', dbServeur.id)
-    ).subscribe(({ items }) => {
-      const sorted = [...items].sort((a,b)=>{
-        const da=new Date(a.createdAt||0).getTime();
-        const db=new Date(b.createdAt||0).getTime();
-        return db-da;
-      });
+    const subCmd = DataStore.observeQuery(Commande).subscribe(({ items }) => {
+      const sorted = items.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
       setCommandes(sorted);
     });
-    return () => sub.unsubscribe();
-  }, [dbServeur?.id]);
+    return () => subCmd.unsubscribe();
+  }, []);
 
   const createOrder = async () => {
     const totalStr = prixTotal.toFixed(2);
+    const nowIso = new Date().toISOString();
     const newCommande = await DataStore.save(
-      new Commande({ serveurID: dbServeur.id, statut: 'EPREPARATIONN', total: totalStr })
+      new Commande({ serveurID: dbServeur.id, statut: 'NOUVELLE', total: totalStr, clientCreatedAt: nowIso })
     );
     await Promise.all(
       panierParDishes.map((ppd) =>

@@ -1,0 +1,57 @@
+type Categorie @model @auth(rules: [{ allow: public, provider: apiKey, operations: [create, read, update, delete] }]) {
+  id: ID!
+  nom: String!
+  Dishes: [Dish] @hasMany(indexName: "byCategorie", fields: ["id"])
+}
+
+type Dish @model @auth(rules: [{ allow: public, provider: apiKey, operations: [create, read, update, delete] }]) {
+  id: ID!
+  name: String!
+  image: String!
+  description: String
+  prix: Float
+  visible: Boolean
+  ingredient: [String!]
+  categorieID: ID @index(name: "byCategorie")
+}
+
+enum CommandeStatut { NOUVELLE EPREPARATIONN PRETE PROBLEME SERVIE ANNULEE }
+
+enum Role { SERVEUR CUISINIER }
+
+type Serveur @model {
+  id: ID!
+  name: String!
+  sub: String
+  role: Role
+  Commandes: [Commande] @hasMany(indexName: "byServeur", fields: ["id"])
+}
+
+type Commande @model @auth(rules: [{ allow: public, provider: apiKey, operations: [create, read, update] }]) {
+  id: ID!
+  serveurID: ID @index(name: "byServeur")
+  total: ID
+  statut: CommandeStatut!
+  clientCreatedAt: AWSDateTime
+  CommandeParDishes: [CommandeParDish] @hasMany(indexName: "byCommande", fields: ["id"])
+}
+
+type CommandeParDish @model @auth(rules: [{ allow: public, provider: apiKey, operations: [create, read, update] }]) {
+  id: ID!
+  quantity: Int!
+  commandeID: ID! @index(name: "byCommande")
+  Dish: Dish @hasOne
+}
+
+type Panier @model {
+  id: ID!
+  serveurID: ID! @index(name: "byServeur")
+  PanierParDishes: [PanierParDish] @hasMany(indexName: "byPanier", fields: ["id"])
+}
+
+type PanierParDish @model {
+  id: ID!
+  quantity: Int
+  Dish: Dish! @hasOne
+  panierID: ID! @index(name: "byPanier")
+}

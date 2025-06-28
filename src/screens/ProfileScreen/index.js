@@ -1,4 +1,4 @@
-import { View, Text, TextInput, StyleSheet, Button, Alert } from "react-native";
+import { View, Text, TextInput, StyleSheet, Button, Alert, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Auth, DataStore } from "aws-amplify";
@@ -12,31 +12,27 @@ const Profile = () => {
 
   const [name, setName] = useState(dbServeur?.name || "");
   const { sub, setDbServeur } = useAuthContext();
+  const [role, setRole] = useState(dbServeur?.role || "SERVEUR");
 
   const navigation = useNavigation();
 
   const onSave = async () => {
+    // ensure DataStore is ready (not in Clearing/Running transition)
+    try { await DataStore.start(); } catch {}
+
     try {
+      // On crée toujours un nouvel enregistrement Serveur pour conserver l'historique du nom
       const serveur = await DataStore.save(
         new Serveur({
           name,
           sub,
+          role,
         })
       );
       setDbServeur(serveur);
-      // console.log(serveur);
-      //  setDbServeur(serveur);
     } catch (e) {
       Alert.alert("Error", e.message);
     }
-
-    /*   if (dbServeur) {
-      await updateServeur();
-    } else {
-      await createServeur();
-    }
-    navigation.goBack();
-    */
   };
 
   /*const updateServeur = async () => {
@@ -65,13 +61,29 @@ const Profile = () => {
 */
   return (
     <SafeAreaView>
-      <Text style={styles.title}>Profile</Text>
+      <Text style={styles.title}>Profil</Text>
       <TextInput
         value={name}
         onChangeText={setName}
         placeholder="Name"
         style={styles.input}
       />
+      <Text style={styles.label}>Rôle</Text>
+      <View style={styles.radioContainer}>
+        {[
+          { key: "SERVEUR", label: "Serveur" },
+          { key: "CUISINIER", label: "Cuisinier" },
+        ].map((opt) => (
+          <Pressable
+            key={opt.key}
+            onPress={() => setRole(opt.key)}
+            style={styles.radioItem}
+          >
+            <Text style={styles.bullet}>{role === opt.key ? "●" : "○"}</Text>
+            <Text style={styles.radioLabel}>{opt.label}</Text>
+          </Pressable>
+        ))}
+      </View>
       <Button onPress={onSave} title="Enregistrer" />
       <Text
         onPress={() => Auth.signOut()}
@@ -95,6 +107,28 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 15,
     borderRadius: 5,
+  },
+  label: {
+    marginLeft: 10,
+    marginTop: 10,
+    fontWeight: "bold",
+  },
+  radioContainer: {
+    flexDirection: "row",
+    marginHorizontal: 10,
+    marginBottom: 10,
+  },
+  radioItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 20,
+  },
+  bullet: {
+    fontSize: 18,
+    marginRight: 6,
+  },
+  radioLabel: {
+    fontSize: 16,
   },
 });
 

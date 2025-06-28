@@ -43,7 +43,7 @@ const Basket = () => {
           { backgroundColor: isEmpty ? "#ccc" : "lightgrey" },
         ]}
       >
-        <Text style={[styles.buttonText, { color: isEmpty ? "#777" : "black" }]}>Envoyer la commande €{prixTotal}</Text>
+        <Text style={[styles.buttonText, { color: isEmpty ? "#777" : "black" }]}>Envoyer la commande - {prixTotal.toFixed(2)}€</Text>
       </Pressable>
     </View>
   );

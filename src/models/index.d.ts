@@ -1,47 +1,125 @@
 import { ModelInit, MutableModel, __modelMeta__, ManagedIdentifier } from "@aws-amplify/datastore";
 // @ts-ignore
-import { LazyLoading, LazyLoadingDisabled, AsyncItem, AsyncCollection } from "@aws-amplify/datastore";
+import { LazyLoading, LazyLoadingDisabled, AsyncCollection, AsyncItem } from "@aws-amplify/datastore";
 
 export enum CommandeStatut {
+  NOUVELLE = "NOUVELLE",
   EPREPARATIONN = "EPREPARATIONN",
   PRETE = "PRETE",
+  PROBLEME = "PROBLEME",
+  SERVIE = "SERVIE",
   ANNULEE = "ANNULEE"
 }
 
+export enum Role {
+  SERVEUR = "SERVEUR",
+  CUISINIER = "CUISINIER"
+}
 
 
-type EagerCommandeParDish = {
+
+type EagerCategorie = {
   readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<CommandeParDish, 'id'>;
+    identifier: ManagedIdentifier<Categorie, 'id'>;
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly quantity: number;
-  readonly Dish?: Dish | null;
-  readonly commandeID: string;
+  readonly nom: string;
+  readonly Dishes?: (Dish | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly commandeParDishDishId?: string | null;
 }
 
-type LazyCommandeParDish = {
+type LazyCategorie = {
   readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<CommandeParDish, 'id'>;
+    identifier: ManagedIdentifier<Categorie, 'id'>;
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly quantity: number;
-  readonly Dish: AsyncItem<Dish | undefined>;
-  readonly commandeID: string;
+  readonly nom: string;
+  readonly Dishes: AsyncCollection<Dish>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly commandeParDishDishId?: string | null;
 }
 
-export declare type CommandeParDish = LazyLoading extends LazyLoadingDisabled ? EagerCommandeParDish : LazyCommandeParDish
+export declare type Categorie = LazyLoading extends LazyLoadingDisabled ? EagerCategorie : LazyCategorie
 
-export declare const CommandeParDish: (new (init: ModelInit<CommandeParDish>) => CommandeParDish) & {
-  copyOf(source: CommandeParDish, mutator: (draft: MutableModel<CommandeParDish>) => MutableModel<CommandeParDish> | void): CommandeParDish;
+export declare const Categorie: (new (init: ModelInit<Categorie>) => Categorie) & {
+  copyOf(source: Categorie, mutator: (draft: MutableModel<Categorie>) => MutableModel<Categorie> | void): Categorie;
+}
+
+type EagerDish = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Dish, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly name: string;
+  readonly image: string;
+  readonly description?: string | null;
+  readonly prix?: number | null;
+  readonly visible?: boolean | null;
+  readonly ingredient?: string[] | null;
+  readonly categorieID?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyDish = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Dish, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly name: string;
+  readonly image: string;
+  readonly description?: string | null;
+  readonly prix?: number | null;
+  readonly visible?: boolean | null;
+  readonly ingredient?: string[] | null;
+  readonly categorieID?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type Dish = LazyLoading extends LazyLoadingDisabled ? EagerDish : LazyDish
+
+export declare const Dish: (new (init: ModelInit<Dish>) => Dish) & {
+  copyOf(source: Dish, mutator: (draft: MutableModel<Dish>) => MutableModel<Dish> | void): Dish;
+}
+
+type EagerServeur = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Serveur, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly name: string;
+  readonly sub?: string | null;
+  readonly role?: Role | keyof typeof Role | null;
+  readonly Commandes?: (Commande | null)[] | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyServeur = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Serveur, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly name: string;
+  readonly sub?: string | null;
+  readonly role?: Role | keyof typeof Role | null;
+  readonly Commandes: AsyncCollection<Commande>;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type Serveur = LazyLoading extends LazyLoadingDisabled ? EagerServeur : LazyServeur
+
+export declare const Serveur: (new (init: ModelInit<Serveur>) => Serveur) & {
+  copyOf(source: Serveur, mutator: (draft: MutableModel<Serveur>) => MutableModel<Serveur> | void): Serveur;
 }
 
 type EagerCommande = {
@@ -53,6 +131,7 @@ type EagerCommande = {
   readonly serveurID?: string | null;
   readonly total?: string | null;
   readonly statut: CommandeStatut | keyof typeof CommandeStatut;
+  readonly clientCreatedAt?: string | null;
   readonly CommandeParDishes?: (CommandeParDish | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -67,6 +146,7 @@ type LazyCommande = {
   readonly serveurID?: string | null;
   readonly total?: string | null;
   readonly statut: CommandeStatut | keyof typeof CommandeStatut;
+  readonly clientCreatedAt?: string | null;
   readonly CommandeParDishes: AsyncCollection<CommandeParDish>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -76,6 +156,70 @@ export declare type Commande = LazyLoading extends LazyLoadingDisabled ? EagerCo
 
 export declare const Commande: (new (init: ModelInit<Commande>) => Commande) & {
   copyOf(source: Commande, mutator: (draft: MutableModel<Commande>) => MutableModel<Commande> | void): Commande;
+}
+
+type EagerCommandeParDish = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<CommandeParDish, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly quantity: number;
+  readonly commandeID: string;
+  readonly Dish?: Dish | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly commandeParDishDishId?: string | null;
+}
+
+type LazyCommandeParDish = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<CommandeParDish, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly quantity: number;
+  readonly commandeID: string;
+  readonly Dish: AsyncItem<Dish | undefined>;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly commandeParDishDishId?: string | null;
+}
+
+export declare type CommandeParDish = LazyLoading extends LazyLoadingDisabled ? EagerCommandeParDish : LazyCommandeParDish
+
+export declare const CommandeParDish: (new (init: ModelInit<CommandeParDish>) => CommandeParDish) & {
+  copyOf(source: CommandeParDish, mutator: (draft: MutableModel<CommandeParDish>) => MutableModel<CommandeParDish> | void): CommandeParDish;
+}
+
+type EagerPanier = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Panier, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly serveurID: string;
+  readonly PanierParDishes?: (PanierParDish | null)[] | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyPanier = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Panier, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly serveurID: string;
+  readonly PanierParDishes: AsyncCollection<PanierParDish>;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type Panier = LazyLoading extends LazyLoadingDisabled ? EagerPanier : LazyPanier
+
+export declare const Panier: (new (init: ModelInit<Panier>) => Panier) & {
+  copyOf(source: Panier, mutator: (draft: MutableModel<Panier>) => MutableModel<Panier> | void): Panier;
 }
 
 type EagerPanierParDish = {
@@ -110,104 +254,4 @@ export declare type PanierParDish = LazyLoading extends LazyLoadingDisabled ? Ea
 
 export declare const PanierParDish: (new (init: ModelInit<PanierParDish>) => PanierParDish) & {
   copyOf(source: PanierParDish, mutator: (draft: MutableModel<PanierParDish>) => MutableModel<PanierParDish> | void): PanierParDish;
-}
-
-type EagerPanier = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Panier, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly PanierParDishes?: (PanierParDish | null)[] | null;
-  readonly serveurID: string;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-type LazyPanier = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Panier, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly PanierParDishes: AsyncCollection<PanierParDish>;
-  readonly serveurID: string;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-export declare type Panier = LazyLoading extends LazyLoadingDisabled ? EagerPanier : LazyPanier
-
-export declare const Panier: (new (init: ModelInit<Panier>) => Panier) & {
-  copyOf(source: Panier, mutator: (draft: MutableModel<Panier>) => MutableModel<Panier> | void): Panier;
-}
-
-type EagerServeur = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Serveur, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly name: string;
-  readonly Commandes?: (Commande | null)[] | null;
-  readonly sub?: string | null;
-  readonly Paniers?: (Panier | null)[] | null;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-type LazyServeur = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Serveur, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly name: string;
-  readonly Commandes: AsyncCollection<Commande>;
-  readonly sub?: string | null;
-  readonly Paniers: AsyncCollection<Panier>;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-export declare type Serveur = LazyLoading extends LazyLoadingDisabled ? EagerServeur : LazyServeur
-
-export declare const Serveur: (new (init: ModelInit<Serveur>) => Serveur) & {
-  copyOf(source: Serveur, mutator: (draft: MutableModel<Serveur>) => MutableModel<Serveur> | void): Serveur;
-}
-
-type EagerDish = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Dish, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly name: string;
-  readonly image: string;
-  readonly description?: string | null;
-  readonly prix?: number | null;
-  readonly ingredient?: string[] | null;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-type LazyDish = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Dish, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly name: string;
-  readonly image: string;
-  readonly description?: string | null;
-  readonly prix?: number | null;
-  readonly ingredient?: string[] | null;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-export declare type Dish = LazyLoading extends LazyLoadingDisabled ? EagerDish : LazyDish
-
-export declare const Dish: (new (init: ModelInit<Dish>) => Dish) & {
-  copyOf(source: Dish, mutator: (draft: MutableModel<Dish>) => MutableModel<Dish> | void): Dish;
 }

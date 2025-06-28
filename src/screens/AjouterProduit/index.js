@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Image,
 } from "react-native";
 import { DataStore } from "aws-amplify";
-import { Dish } from "../../models";
+import { Dish, Categorie } from "../../models";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { Picker } from "@react-native-picker/picker";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 const Produit = () => {
   const [name, setName] = useState("");
@@ -17,7 +20,28 @@ const Produit = () => {
   const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
   const [ingredient, setIngredient] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCatId, setSelectedCatId] = useState("");
   const navigation = useNavigation();
+  const { dbServeur } = useAuthContext();
+  const isServeur = dbServeur?.role === "SERVEUR";
+
+  // Charger les catégories existantes
+  useEffect(() => {
+    DataStore.query(Categorie).then(setCategories);
+    const sub = DataStore.observe(Categorie).subscribe(() => {
+      DataStore.query(Categorie).then(setCategories);
+    });
+    return () => sub.unsubscribe();
+  }, []);
+
+  React.useEffect(() => {
+    if (isServeur) {
+      Alert.alert("Accès refusé", "Vous n'êtes pas autorisé à ajouter un plat.", [
+        { text: "OK", onPress: () => navigation.goBack() },
+      ]);
+    }
+  }, [isServeur]);
 
   const addIngredient = () => {
     const newIngredient = "";
@@ -36,11 +60,12 @@ const Produit = () => {
     }
 
     const nouveauProduit = new Dish({
-      name: name,
-      image: image,
-      description: description,
-      prix: parseFloat(prix),
-      ingredient: ingredient,
+      name,
+      image,
+      description,
+      prix: parsedPrix,
+      ingredient,
+      ...(selectedCatId ? { categorieID: selectedCatId } : {}),
     });
 
     try {
@@ -52,6 +77,7 @@ const Produit = () => {
         setImage("");
         setDescription("");
         setIngredient([]);
+        setSelectedCatId("");
       };
 
       Alert.alert("Succès", "Le produit a été ajouté avec succès", [
@@ -72,6 +98,9 @@ const Produit = () => {
     }
   };
 
+  if (isServeur) {
+    return null;
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Ajouter un produit</Text>
@@ -79,12 +108,6 @@ const Produit = () => {
         value={name}
         onChangeText={setName}
         placeholder="Nom"
-        style={styles.input}
-      />
-      <TextInput
-        value={image}
-        onChangeText={setImage}
-        placeholder="Image"
         style={styles.input}
       />
       <TextInput
@@ -101,6 +124,12 @@ const Produit = () => {
         keyboardType="numeric"
       />
       <TextInput
+        value={image}
+        onChangeText={setImage}
+        placeholder="Image (URL)"
+        style={styles.input}
+      />
+            <TextInput
         value={ingredient.join(", ")}
         onChangeText={(text) => setIngredient(text.split(", "))}
         placeholder="Ingrédients"
@@ -112,6 +141,7 @@ const Produit = () => {
       <TouchableOpacity onPress={ajouterProduit} style={styles.addButton}>
         <Text style={styles.buttonText}>Ajouter un produit</Text>
       </TouchableOpacity>
+      
     </View>
   );
 };
@@ -145,6 +175,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  picker: {
+    backgroundColor: "#f2f2f2",
+    marginBottom: 10,
   },
 });
 
