@@ -14,7 +14,7 @@ const DishListItem = ({ dish }) => {
 
   return (
     <Pressable
-      onPress={() => navigation.navigate("Dish", { id: dish.id })}
+      onPress={() => navigation.navigate("Plat", { id: dish.id })}
       style={styles.container}
     >
       <View style={{ flex: 1 }}>

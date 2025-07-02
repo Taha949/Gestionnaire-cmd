@@ -17,7 +17,7 @@ import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 const DishListItem2 = ({ dish }) => {
   const navigation = useNavigation();
   const { dbServeur } = useAuthContext();
-  const isServeur = (dbServeur?.role || '').toUpperCase() === 'SERVEUR';
+  const isServeur = (dbServeur?.role || "").toUpperCase() === "SERVEUR";
 
   const handleDeleteDish = () => {
     Alert.alert(
@@ -60,13 +60,21 @@ const DishListItem2 = ({ dish }) => {
   const isUnavailable = dish.visible === false;
 
   return (
-    <View style={[styles.container, isUnavailable && styles.unavailableContainer]}>
+    <View
+      style={[styles.container, isUnavailable && styles.unavailableContainer]}
+    >
       <View style={{ flex: 1 }}>
         <Text style={[styles.name, isUnavailable && styles.unavailableText]}>
           {dish.name} {isUnavailable ? "(épuisé)" : ""}
         </Text>
-        <Text style={[styles.description, isUnavailable && styles.unavailableText]}>{dish.description}</Text>
-        <Text style={[styles.price, isUnavailable && styles.unavailableText]}>{dish.price}</Text>
+        <Text
+          style={[styles.description, isUnavailable && styles.unavailableText]}
+        >
+          {dish.description}
+        </Text>
+        <Text style={[styles.price, isUnavailable && styles.unavailableText]}>
+          {dish.price}
+        </Text>
       </View>
 
       {dish.image && (
@@ -75,15 +83,33 @@ const DishListItem2 = ({ dish }) => {
 
       {!isServeur && (
         <>
-          <Pressable onPress={() => navigation.navigate('ChangeDish',{id:dish.id})} style={styles.editButton} hitSlop={10}>
+          <Pressable
+            onPress={() =>
+              navigation.navigate("Modifier un produit", { id: dish.id })
+            }
+            style={styles.editButton}
+            hitSlop={10}
+          >
             <MaterialIcons name="edit" size={24} color="black" />
           </Pressable>
 
-          <Pressable onPress={toggleVisibility} style={styles.eyeButton} hitSlop={10}>
-            <MaterialCommunityIcons name={dish.visible === false ? 'eye' : 'eye-off'} size={24} color="black" />
+          <Pressable
+            onPress={toggleVisibility}
+            style={styles.eyeButton}
+            hitSlop={10}
+          >
+            <MaterialCommunityIcons
+              name={dish.visible === false ? "eye" : "eye-off"}
+              size={24}
+              color="black"
+            />
           </Pressable>
 
-          <Pressable onPress={handleDeleteDish} style={styles.trashButton} hitSlop={10}>
+          <Pressable
+            onPress={handleDeleteDish}
+            style={styles.trashButton}
+            hitSlop={10}
+          >
             <MaterialIcons name="delete" size={24} color="black" />
           </Pressable>
         </>

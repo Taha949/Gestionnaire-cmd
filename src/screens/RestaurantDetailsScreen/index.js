@@ -19,8 +19,8 @@ export default function RestaurantsDetailsScreen() {
   useEffect(() => {
     DataStore.query(Dish)
       .then((data) => {
-        setDishes(data.filter((d)=> d.visible !== false));
-        // console.log(data); // Affiche les données récupérées dans la console
+        setDishes(data.filter((d) => d.visible !== false));
+        // console.log(data);
       })
       .catch((error) => {
         console.log("Erreur lors de la récupération des plats :", error);
@@ -31,7 +31,7 @@ export default function RestaurantsDetailsScreen() {
     DataStore.query(Dish)
       .then((data) => {
         // console.log("Données des plats :", data); // Afficher les données des plats
-        setDishes(data.filter((d)=> d.visible !== false));
+        setDishes(data.filter((d) => d.visible !== false));
       })
       .catch((error) => {
         console.log("Erreur lors de la récupération des plats :", error); // Afficher les éventuelles erreurs
@@ -51,7 +51,7 @@ export default function RestaurantsDetailsScreen() {
       />
 
       <Pressable
-        onPress={() => navigation.navigate("Basket")}
+        onPress={() => navigation.navigate("Panier")}
         style={styles.button}
       >
         <Text style={styles.buttonText}>

@@ -1,8 +1,8 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { Amplify, DataStore } from 'aws-amplify';
+import { Amplify, DataStore } from "aws-amplify";
 import { Panier, PanierParDish, Dish as DishModel } from "../models";
 import { useAuthContext } from "./AuthContext";
-
+//Basket
 const BasketContext = createContext({});
 const BasketContextProvider = ({ children }) => {
   const { dbServeur } = useAuthContext();
@@ -31,7 +31,9 @@ const BasketContextProvider = ({ children }) => {
               console.log("ppd.panierParDishDishId", ppd.panierParDishDishId);
               let dish = ppd.Dish;
               if (!dish || !dish.name) {
-                const dishId = ppd.panierParDishDishId || (typeof dish === "string" ? dish : undefined);
+                const dishId =
+                  ppd.panierParDishDishId ||
+                  (typeof dish === "string" ? dish : undefined);
                 if (dishId) {
                   dish = await DataStore.query(DishModel, dishId);
                 }
@@ -57,8 +59,11 @@ const BasketContextProvider = ({ children }) => {
         panierParDishDishId: dish.id,
       })
     );
-    // Utiliser le dish tel qu'il est passé (peut contenir ingredient filtré)
-    setPanierParDishes([...panierParDishes, { ...newPanierParDish, Dish: dish }]);
+    // Utiliser le dish tel qu'il est passé (peux contenir ingredient filtré)
+    setPanierParDishes([
+      ...panierParDishes,
+      { ...newPanierParDish, Dish: dish },
+    ]);
   };
 
   const createNewpanier = async () => {
@@ -74,16 +79,14 @@ const BasketContextProvider = ({ children }) => {
       console.log("clearBasketContext: pas de panier");
       return;
     }
-    // Plutôt que de supprimer les lignes PanierParDish (ce qui semble entraîner la suppression du Dish),
-    // on crée simplement un nouveau panier vide et on met à jour l'état local.
 
-    // 1. Vider la liste locale pour que l'UI reflète le panier vide
     setPanierParDishes([]);
 
     // 2. Créer un nouveau panier pour le serveur courant
-    const newPanier = await DataStore.save(new Panier({ serveurID: dbServeur.id }));
+    const newPanier = await DataStore.save(
+      new Panier({ serveurID: dbServeur.id })
+    );
 
-    // 3. Mettre à jour l'état afin que les prochains ajouts aillent dans ce nouveau panier
     setPanier(newPanier);
 
     console.log("clearBasketContext: nouveau panier créé", newPanier.id);
@@ -100,14 +103,14 @@ const BasketContextProvider = ({ children }) => {
       if (!original) return;
 
       if (newQuantity <= 0) {
-        // On met simplement la quantité à 0 pour garder la trace, sans supprimer l'objet ni le Dish associé
         await DataStore.save(
           PanierParDish.copyOf(original, (updated) => {
             updated.quantity = 0;
           })
         );
-        // Retirer visuellement du panier
-        setPanierParDishes((cur) => cur.filter((i) => i.id !== panierParDish.id));
+        setPanierParDishes((cur) =>
+          cur.filter((i) => i.id !== panierParDish.id)
+        );
         return;
       }
 
@@ -127,10 +130,20 @@ const BasketContextProvider = ({ children }) => {
     }
   };
 
-  console.log("BasketContext: clearBasketContext est", typeof clearBasketContext);
+  // console.log(
+  //   "BasketContext: clearBasketContext est",
+  //   typeof clearBasketContext
+  // );
   return (
     <BasketContext.Provider
-      value={{ addDishToBasket, panier, panierParDishes, prixTotal, clearBasket: clearBasketContext, updateQuantity }}
+      value={{
+        addDishToBasket,
+        panier,
+        panierParDishes,
+        prixTotal,
+        clearBasket: clearBasketContext,
+        updateQuantity,
+      }}
     >
       {children}
     </BasketContext.Provider>

@@ -13,10 +13,11 @@ const OrderContextProvider = ({ children }) => {
   const [itemsCount, setItemsCount] = useState(0);
   const [total, setTotal] = useState(0);
 
-  // observer toutes les commandes et les trier (plus de filtre serveurID)
   useEffect(() => {
     const subCmd = DataStore.observeQuery(Commande).subscribe(({ items }) => {
-      const sorted = items.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      const sorted = items.sort(
+        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+      );
       setCommandes(sorted);
     });
     return () => subCmd.unsubscribe();
@@ -26,7 +27,12 @@ const OrderContextProvider = ({ children }) => {
     const totalStr = prixTotal.toFixed(2);
     const nowIso = new Date().toISOString();
     const newCommande = await DataStore.save(
-      new Commande({ serveurID: dbServeur.id, statut: 'NOUVELLE', total: totalStr, clientCreatedAt: nowIso })
+      new Commande({
+        serveurID: dbServeur.id,
+        statut: "NOUVELLE",
+        total: totalStr,
+        clientCreatedAt: nowIso,
+      })
     );
     await Promise.all(
       panierParDishes.map((ppd) =>
@@ -50,9 +56,8 @@ const OrderContextProvider = ({ children }) => {
       throw new Error("La commande n'existe pas.");
     }
 
-    const commandeParDishes = await DataStore.query(
-      CommandeParDish,
-      (cd) => cd.commandeID("eq", id)
+    const commandeParDishes = await DataStore.query(CommandeParDish, (cd) =>
+      cd.commandeID("eq", id)
     );
 
     // Pour chaque CommandeParDish, s'assurer que Dish est bien chargé
@@ -61,7 +66,9 @@ const OrderContextProvider = ({ children }) => {
         let dish = cpd.Dish;
         if (!dish || !dish.name) {
           // charger via id si nécessaire
-          const dishId = cpd.commandeParDishDishId || (typeof dish === "string" ? dish : undefined);
+          const dishId =
+            cpd.commandeParDishDishId ||
+            (typeof dish === "string" ? dish : undefined);
           if (dishId) {
             dish = await DataStore.query(Dish, dishId);
           }
@@ -74,11 +81,16 @@ const OrderContextProvider = ({ children }) => {
   };
 
   const computeMetrics = async () => {
-    const cpd = await DataStore.query(CommandeParDish, (c) => c.commandeID('eq', commande.id));
-    const qtySum = cpd.reduce((s, it) => s + it.quantity, 0);   // <- somme
+    const cpd = await DataStore.query(CommandeParDish, (c) =>
+      c.commandeID("eq", commande.id)
+    );
+    const qtySum = cpd.reduce((s, it) => s + it.quantity, 0); // <- somme
     setItemsCount(qtySum);
 
-    if (commande.total) { setTotal(parseFloat(commande.total)); return; }
+    if (commande.total) {
+      setTotal(parseFloat(commande.total));
+      return;
+    }
 
     const sums = await Promise.all(
       cpd.map(async (it) => {

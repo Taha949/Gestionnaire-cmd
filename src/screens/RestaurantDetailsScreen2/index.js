@@ -16,7 +16,7 @@ export default function RestaurantsDetailsScreen() {
   const { dbServeur } = useAuthContext();
   const isServeur = dbServeur?.role === "SERVEUR";
   const handleAjouterProduit = () => {
-    navigation.navigate("Produit");
+    navigation.navigate("Ajouter un produit");
   };
 
   const [dishes, setDishes] = useState([]);

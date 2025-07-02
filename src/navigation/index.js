@@ -80,8 +80,8 @@ const HomeStackNavigator = () => {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Restaurant" component={RestaurantDetailsScreen} />
-      <HomeStack.Screen name="Dish" component={DishDetailsScreen} />
-      <HomeStack.Screen name="Basket" component={Basket} />
+      <HomeStack.Screen name="Plat" component={DishDetailsScreen} />
+      <HomeStack.Screen name="Panier" component={Basket} />
     </HomeStack.Navigator>
   );
 };
@@ -103,8 +103,8 @@ const ProductStackNavigator = () => {
         name="Gestion des produits"
         component={RestaurantsDetailsScreen2}
       />
-      <OrderStack.Screen name="Produit" component={AjouterProduit} />
-      <OrderStack.Screen name="ChangeDish" component={ChangeDish} />
+      <OrderStack.Screen name="Ajouter un produit" component={AjouterProduit} />
+      <OrderStack.Screen name="Modifier un produit" component={ChangeDish} />
     </OrderStack.Navigator>
   );
 };
